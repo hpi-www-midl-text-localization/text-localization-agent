@@ -1,4 +1,5 @@
 import click
+import os
 from PIL import Image
 import numpy as np
 from text_localization_environment import TextLocEnv
@@ -24,7 +25,8 @@ def main(steps, gpu, imagefile, boxfile):
         gpu_number = -1
 
     locations = np.loadtxt(imagefile, dtype=str)
-    images = [Image.open(i) for i in locations]
+    images_base_path = os.path.dirname(imagefile)
+    images = [Image.open(images_base_path + i.strip('.')) for i in locations]
     bboxes = np.load(boxfile)
 
     env = TextLocEnv(images, bboxes, gpu)
