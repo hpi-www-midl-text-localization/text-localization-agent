@@ -1,4 +1,5 @@
 import click
+import os
 from PIL import Image
 import numpy as np
 from text_localization_environment import TextLocEnv
@@ -24,7 +25,8 @@ def main(steps, gpu, imagefile, boxfile):
         gpu_number = -1
 
     locations = np.loadtxt(imagefile, dtype=str)
-    images = [Image.open(i) for i in locations]
+    images_base_path = os.path.dirname(imagefile)
+    images = [Image.open(images_base_path + i.strip('.')) for i in locations]
     bboxes = np.load(boxfile)
 
     env = TextLocEnv(images, bboxes, gpu)
@@ -34,7 +36,8 @@ def main(steps, gpu, imagefile, boxfile):
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
         obs_size, n_actions,
         n_hidden_layers=2, n_hidden_channels=1024)
-    q_func = q_func.to_gpu(gpu_number)
+    if gpu:
+        q_func = q_func.to_gpu(gpu_number)
 
     # Use Adam to optimize q_func. eps=1e-2 is for stability.
     optimizer = chainer.optimizers.Adam(eps=1e-2)
