@@ -36,7 +36,8 @@ def main(steps, gpu, imagefile, boxfile):
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
         obs_size, n_actions,
         n_hidden_layers=2, n_hidden_channels=1024)
-    q_func = q_func.to_gpu(gpu_number)
+    if gpu:
+        q_func = q_func.to_gpu(gpu_number)
 
     # Use Adam to optimize q_func. eps=1e-2 is for stability.
     optimizer = chainer.optimizers.Adam(eps=1e-2)
