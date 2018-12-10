@@ -1,1 +1,5 @@
-Click==7.0
+chainerrl
+chainer
+numpy
+click
+Pillow
