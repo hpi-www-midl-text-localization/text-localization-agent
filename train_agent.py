@@ -7,14 +7,16 @@ import chainer
 import chainerrl
 import logging
 import sys
-
+from tb_chainer import SummaryWriter
+import time
 
 @click.command()
 @click.option("--steps", "-s", default=2000, help="Amount of steps to train the agent.")
 @click.option("--gpu/--no-gpu", default=False)
 @click.option("--imagefile", "-i", default='image_locations.txt', help="Path to the file containing the image locations.", type=click.Path(exists=True))
 @click.option("--boxfile", "-b", default='bounding_boxes.npy', help="Path to the bounding boxes.", type=click.Path(exists=True))
-def main(steps, gpu, imagefile, boxfile):
+@click.option("--tensorboard/--no-tensorboard", default=True)
+def main(steps, gpu, imagefile, boxfile, tensorboard):
     print(steps)
     print(gpu)
     print(imagefile)
@@ -63,16 +65,31 @@ def main(steps, gpu, imagefile, boxfile):
 
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='')
 
+    step_hooks = []
+    if tensorboard:
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        agentClassName = agent.__class__.__name__[:10]
+        writer = SummaryWriter("tensorboard/tensorBoard_exp_" + timestr + "_" + agentClassName)
+        step_hooks = [TensorBoardLoggingStepHook(writer)]
+
     chainerrl.experiments.train_agent_with_evaluation(
         agent, env,
         steps=steps,  # Train the agent for 5000 steps
         eval_n_runs=10,  # 10 episodes are sampled for each evaluation
         max_episode_len=50,  # Maximum length of each episodes
         eval_interval=500,  # Evaluate the agent after every 100 steps
-        outdir='result')  # Save everything to 'result' directory
+        outdir='result', # Save everything to 'result' directory
+        step_hooks=step_hooks)
 
     agent.save('agent')
 
+class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
+    def __init__(self, summary_writer):
+        self.summary_writer = summary_writer
+        return
+
+    def __call__(self, env, agent, step):
+        return
 
 if __name__ == '__main__':
     main()
