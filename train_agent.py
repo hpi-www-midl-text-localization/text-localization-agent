@@ -89,6 +89,9 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
         return
 
     def __call__(self, env, agent, step):
+        step_count = agent.t
+
+        self.summary_writer.add_scalar('average_q', agent.average_q, step_count)
         return
 
 if __name__ == '__main__':
