@@ -3,3 +3,4 @@ chainer
 numpy
 click
 Pillow
+tensorboard-chainer
