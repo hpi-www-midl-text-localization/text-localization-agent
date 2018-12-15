@@ -1,6 +1,6 @@
 import click
 import os
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 from text_localization_environment import TextLocEnv
 import chainer
@@ -112,14 +112,17 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
 
         debug_image = Image.new(mode='RGB',
                                 size=(image.width, image.height + 16),
-                                color=0)
+                                color='black')
         debug_image.paste(image)
 
         draw = ImageDraw.Draw(debug_image)
-        draw.rectangle(bbox.tolist(), outline=(255, 255, 255))
-        draw.text(xy=(2, image.height + 2),
+        draw.rectangle(bbox.tolist(), outline='white')
+        draw.rectangle((0, image.height, image.width, image.height + 16), fill='black')
+        font = ImageFont.truetype('fonts/open-sans/OpenSans-SemiBold.ttf', 12)
+        draw.text(xy=(2, image.height),
                   text='Last action: %s' % last_action_name,
-                  fill='white')
+                  fill='white',
+                  font=font)
 
         return debug_image
 
