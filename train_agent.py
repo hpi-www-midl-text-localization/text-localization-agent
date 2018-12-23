@@ -14,17 +14,22 @@ import time
 @click.option("--steps", "-s", default=2000, help="Amount of steps to train the agent.")
 @click.option("--gpu", default=-1, help="ID of the GPU to be used. -1 if the CPU should be used instead.")
 @click.option("--imagefile", "-i", default='image_locations.txt', help="Path to the file containing the image locations.", type=click.Path(exists=True))
+@click.option("--relative/--absolute", default=True, help="Whether the imagefile uses relative or absolute paths.")
 @click.option("--boxfile", "-b", default='bounding_boxes.npy', help="Path to the bounding boxes.", type=click.Path(exists=True))
 @click.option("--tensorboard/--no-tensorboard", default=False)
-def main(steps, gpu, imagefile, boxfile, tensorboard):
+def main(steps, gpu, imagefile, relative, boxfile, tensorboard):
     print(steps)
     print(gpu)
     print(imagefile)
     print(boxfile)
+    print(relative)
 
-    relative_paths = np.loadtxt(imagefile, dtype=str)
-    images_base_path = os.path.dirname(imagefile)
-    absolute_paths = [images_base_path + i.strip('.') for i in relative_paths]
+    if relative:
+        relative_paths = np.loadtxt(imagefile, dtype=str)
+        images_base_path = os.path.dirname(imagefile)
+        absolute_paths = [images_base_path + i.strip('.') for i in relative_paths]
+    else:
+        absolute_paths = np.loadtxt(imagefile, dtype=str).tolist()
     bboxes = np.load(boxfile)
 
     env = TextLocEnv(absolute_paths, bboxes, gpu)

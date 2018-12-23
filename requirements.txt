@@ -4,3 +4,4 @@ numpy
 click
 Pillow
 tensorboard-chainer
+matplotlib
