@@ -6,17 +6,20 @@ import click
 @click.command()
 @click.option("--image_path", "-i", default="./images/", help="Directoy where the COCO-2014 images are located.", type=click.Path(exists=True))
 @click.option("--annotations", "-a", default="cocotext.v2.json", help="The json file that contains the annotations.", type=click.Path(exists=True))
-def prepare_coco(image_path, annotations):
+@click.option("--relative/--absolute", default=True, help="Whether the created imagefile should relative or absolute paths.")
+def prepare_coco(image_path, annotations, relative):
     ct = coco_text.COCO_Text(annotations)
 
-    # image_path = 'C:/Users/Jona/.chainer/dataset/pfnet/chainercv/coco/images/train2014'
-
-    imgIds = ct.getImgIds(imgIds=ct.train, catIds=[('legibility', 'legible'), ('class', 'machine printed')])
+    imgIds = ct.getImgIds(imgIds=ct.train, catIds=[('legibility', 'legible')])
 
     imgs = ct.loadImgs(imgIds)
 
     img_ids = [imgs[i]['id'] for i in range(len(imgs))]
-    img_paths = [image_path + "/" + imgs[i]['file_name'] for i in range(len(imgs))]
+
+    if relative:
+        img_paths = ["./images/" + imgs[i]['file_name'] for i in range(len(imgs))]
+    else:
+        img_paths = [image_path + "/" + imgs[i]['file_name'] for i in range(len(imgs))]
 
     np.savetxt("image_locations.txt", img_paths, fmt="%s")
 
