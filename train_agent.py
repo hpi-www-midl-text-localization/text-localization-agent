@@ -69,7 +69,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
         agentClassName = agent.__class__.__name__[:10]
         writer = SummaryWriter("tensorboard/tensorBoard_exp_" + timestr + "_" + agentClassName)
         step_hooks = [TensorBoardLoggingStepHook(writer)]
-        handler = TensorBoardEvaluationLoggingHandler(writer)
+        handler = TensorBoardEvaluationLoggingHandler(writer, agent)
         logger = logging.getLogger()
         logger.addHandler(handler)
 
@@ -130,16 +130,18 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
         return debug_image
 
 class TensorBoardEvaluationLoggingHandler(logging.Handler):
-    def __init__(self, summary_writer, level=logging.NOTSET):
+    def __init__(self, summary_writer, agent, level=logging.NOTSET):
         logging.Handler.__init__(self, level)
         self.summary_writer = summary_writer
+        self.agent = agent
         return
 
     def emit(self, record):
         matches = re.search(r'The best score is updated ([^ ]*) -> ([^ ]*)', record.getMessage())
         if matches:
             new_best_score = matches.group(2)
-            self.summary_writer.add_scalar('evaluation_new_best_score', new_best_score)
+            step_count = self.agent.t
+            self.summary_writer.add_scalar('evaluation_new_best_score', new_best_score, step_count)
         return
 
 if __name__ == '__main__':
