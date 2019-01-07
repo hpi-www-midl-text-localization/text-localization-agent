@@ -15,7 +15,7 @@ def create_environment(imagefile='image_locations.txt', boxfile='bounding_boxes.
 
 
 def load_agent(env, directory="agent", gpu=0):
-    obs_size = 4186
+    obs_size = 2138
     n_actions = env.action_space.n
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
         obs_size, n_actions,
@@ -66,3 +66,6 @@ def episode(env, agent):
             print("Done!")
     print('test episode:', 'R:', R)
     agent.stop_episode()
+
+
+create_environment("../dataset-generator/image_locations.txt", "../dataset-generator/bounding_boxes.npy")

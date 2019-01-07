@@ -10,6 +10,7 @@ import sys
 from tb_chainer import SummaryWriter
 import time
 
+
 @click.command()
 @click.option("--steps", "-s", default=2000, help="Amount of steps to train the agent.")
 @click.option("--gpu", default=-1, help="ID of the GPU to be used. -1 if the CPU should be used instead.")
@@ -29,7 +30,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
 
     env = TextLocEnv(absolute_paths, bboxes, gpu)
 
-    obs_size = 4186
+    obs_size = 2138
     n_actions = env.action_space.n
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
         obs_size, n_actions,
@@ -79,6 +80,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
 
     agent.save('agent')
 
+
 class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
     def __init__(self, summary_writer):
         self.summary_writer = summary_writer
@@ -121,6 +123,7 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
                   font=font)
 
         return debug_image
+
 
 if __name__ == '__main__':
     main()
