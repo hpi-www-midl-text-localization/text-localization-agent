@@ -9,6 +9,7 @@ import logging
 import sys
 from tb_chainer import SummaryWriter
 import time
+import re
 
 @click.command()
 @click.option("--steps", "-s", default=2000, help="Amount of steps to train the agent.")
@@ -62,11 +63,15 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='')
 
     step_hooks = []
+    logger = None
     if tensorboard:
         timestr = time.strftime("%Y%m%d-%H%M%S")
         agentClassName = agent.__class__.__name__[:10]
         writer = SummaryWriter("tensorboard/tensorBoard_exp_" + timestr + "_" + agentClassName)
         step_hooks = [TensorBoardLoggingStepHook(writer)]
+        handler = TensorBoardEvaluationLoggingHandler(writer)
+        logger = logging.getLogger()
+        logger.addHandler(handler)
 
     chainerrl.experiments.train_agent_with_evaluation(
         agent, env,
@@ -76,6 +81,8 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
         eval_interval=500,  # Evaluate the agent after every 100 steps
         outdir='result', # Save everything to 'result' directory
         step_hooks=step_hooks)
+        step_hooks=step_hooks,
+        logger=logger)
 
     agent.save('agent')
 
@@ -121,6 +128,19 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
                   font=font)
 
         return debug_image
+
+class TensorBoardEvaluationLoggingHandler(logging.Handler):
+    def __init__(self, summary_writer, level=logging.NOTSET):
+        logging.Handler.__init__(self, level)
+        self.summary_writer = summary_writer
+        return
+
+    def emit(self, record):
+        matches = re.search(r'The best score is updated ([^ ]*) -> ([^ ]*)', record.getMessage())
+        if matches:
+            new_best_score = matches.group(2)
+            self.summary_writer.add_scalar('evaluation_new_best_score', new_best_score)
+        return
 
 if __name__ == '__main__':
     main()
