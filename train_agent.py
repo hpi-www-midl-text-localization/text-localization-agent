@@ -80,7 +80,6 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
         max_episode_len=50,  # Maximum length of each episodes
         eval_interval=500,  # Evaluate the agent after every 100 steps
         outdir='result', # Save everything to 'result' directory
-        step_hooks=step_hooks)
         step_hooks=step_hooks,
         logger=logger)
 
