@@ -66,6 +66,3 @@ def episode(env, agent):
             print("Done!")
     print('test episode:', 'R:', R)
     agent.stop_episode()
-
-
-create_environment("../dataset-generator/image_locations.txt", "../dataset-generator/bounding_boxes.npy")
