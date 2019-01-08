@@ -133,6 +133,7 @@ class TensorBoardEvaluationLoggingHandler(logging.Handler):
         logging.Handler.__init__(self, level)
         self.summary_writer = summary_writer
         self.agent = agent
+        self.evaluation_episode = 0
         return
 
     def emit(self, record):
@@ -145,8 +146,9 @@ class TensorBoardEvaluationLoggingHandler(logging.Handler):
         match_reward = re.search(r'evaluation episode ([^ ]*) length:([^ ]*) R:([^ ]*)', record.getMessage())
         if match_reward:
             epsisode_reward = match_reward.group(3)
-            step_count = self.agent.t
-            self.summary_writer.add_scalar('evaluation_episode_reward', epsisode_reward, step_count)
+            self.summary_writer.add_scalar('evaluation_episode_reward', epsisode_reward, self.evaluation_episode)
+
+            self.evaluation_episode += 1
         return
 
 if __name__ == '__main__':
