@@ -142,7 +142,7 @@ class TensorBoardEvaluationLoggingHandler(logging.Handler):
             step_count = self.agent.t
             self.summary_writer.add_scalar('evaluation_new_best_score', new_best_score, step_count)
 
-        match_reward = re.search(r'evaluation episode ([^ ]*) length:([^ ]*) R: ([^ ]*)', record.getMessage())
+        match_reward = re.search(r'evaluation episode ([^ ]*) length:([^ ]*) R:([^ ]*)', record.getMessage())
         if match_reward:
             epsisode_reward = match_reward.group(3)
             step_count = self.agent.t
