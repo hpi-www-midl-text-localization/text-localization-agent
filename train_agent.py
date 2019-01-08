@@ -136,11 +136,17 @@ class TensorBoardEvaluationLoggingHandler(logging.Handler):
         return
 
     def emit(self, record):
-        matches = re.search(r'The best score is updated ([^ ]*) -> ([^ ]*)', record.getMessage())
-        if matches:
-            new_best_score = matches.group(2)
+        match_new_best = re.search(r'The best score is updated ([^ ]*) -> ([^ ]*)', record.getMessage())
+        if match_new_best:
+            new_best_score = match_new_best.group(2)
             step_count = self.agent.t
             self.summary_writer.add_scalar('evaluation_new_best_score', new_best_score, step_count)
+
+        match_reward = re.search(r'evaluation episode ([^ ]*) length:([^ ]*) R: ([^ ]*)', record.getMessage())
+        if match_reward:
+            epsisode_reward = match_reward.group(3)
+            step_count = self.agent.t
+            self.summary_writer.add_scalar('evaluation_episode_reward', epsisode_reward, step_count)
         return
 
 if __name__ == '__main__':
