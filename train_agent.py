@@ -9,6 +9,7 @@ import logging
 import sys
 from tb_chainer import SummaryWriter
 import time
+import re
 
 @click.command()
 @click.option("--steps", "-s", default=2000, help="Amount of steps to train the agent.")
@@ -61,21 +62,28 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
 
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='')
 
+    eval_run_count = 10
+
     step_hooks = []
+    logger = None
     if tensorboard:
         timestr = time.strftime("%Y%m%d-%H%M%S")
         agentClassName = agent.__class__.__name__[:10]
         writer = SummaryWriter("tensorboard/tensorBoard_exp_" + timestr + "_" + agentClassName)
         step_hooks = [TensorBoardLoggingStepHook(writer)]
+        handler = TensorBoardEvaluationLoggingHandler(writer, agent, eval_run_count)
+        logger = logging.getLogger()
+        logger.addHandler(handler)
 
     chainerrl.experiments.train_agent_with_evaluation(
         agent, env,
         steps=steps,  # Train the agent for 5000 steps
-        eval_n_runs=10,  # 10 episodes are sampled for each evaluation
+        eval_n_runs=eval_run_count,  # 10 episodes are sampled for each evaluation
         max_episode_len=50,  # Maximum length of each episodes
         eval_interval=500,  # Evaluate the agent after every 100 steps
         outdir='result', # Save everything to 'result' directory
-        step_hooks=step_hooks)
+        step_hooks=step_hooks,
+        logger=logger)
 
     agent.save('agent')
 
@@ -121,6 +129,40 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
                   font=font)
 
         return debug_image
+
+class TensorBoardEvaluationLoggingHandler(logging.Handler):
+    def __init__(self, summary_writer, agent, eval_run_count, level=logging.NOTSET):
+        logging.Handler.__init__(self, level)
+        self.summary_writer = summary_writer
+        self.agent = agent
+        self.eval_run_count = eval_run_count
+        self.episode_rewards = np.empty(eval_run_count)
+        self.episode_lengths = np.empty(eval_run_count)
+        return
+
+    def emit(self, record):
+        match_new_best = re.search(r'The best score is updated ([^ ]*) -> ([^ ]*)', record.getMessage())
+        if match_new_best:
+            new_best_score = match_new_best.group(2)
+            step_count = self.agent.t
+            self.summary_writer.add_scalar('evaluation_new_best_score', new_best_score, step_count)
+
+        match_reward = re.search(r'evaluation episode ([^ ]*) length:([^ ]*) R:([^ ]*)', record.getMessage())
+        if match_reward:
+            episode_number = int(match_reward.group(1))
+            episode_length = int(match_reward.group(2))
+            episode_reward = float(match_reward.group(3))
+
+            self.episode_lengths[episode_number] = episode_length
+            self.episode_rewards[episode_number] = episode_reward
+
+            if episode_number == self.eval_run_count - 1:
+                step_count = self.agent.t
+                self.summary_writer.add_scalar('evaluation_length_mean', np.mean(self.episode_lengths), step_count)
+                self.summary_writer.add_scalar('evaluation_reward_mean', np.mean(self.episode_rewards), step_count)
+                self.summary_writer.add_scalar('evaluation_reward_median', np.median(self.episode_rewards), step_count)
+                self.summary_writer.add_scalar('evaluation_reward_variance', np.var(self.episode_rewards), step_count)
+        return
 
 if __name__ == '__main__':
     main()
