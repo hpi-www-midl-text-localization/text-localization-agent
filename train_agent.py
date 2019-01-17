@@ -84,8 +84,8 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
         agent, env,
         steps=steps,  # Train the agent for 5000 steps
         eval_n_runs=eval_run_count,  # 10 episodes are sampled for each evaluation
-        max_episode_len=5,  # Maximum length of each episodes
-        eval_interval=5,  # Evaluate the agent after every 100 steps
+        max_episode_len=50,  # Maximum length of each episodes
+        eval_interval=500,  # Evaluate the agent after every 100 steps
         outdir='result',  # Save everything to 'result' directory
         step_hooks=step_hooks,
         logger=logger)
