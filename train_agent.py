@@ -48,8 +48,11 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
     gamma = 0.95
 
     # Use epsilon-greedy for exploration
-    explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-        epsilon=0.3, random_action_func=env.action_space.sample)
+    explorer = chainerrl.explorers.LinearDecayEpsilonGreedy(
+        start_epsilon=1.0,
+        end_epsilon=0.1,
+        decay_steps=1000,
+        random_action_func=env.action_space.sample)
 
     # DQN uses Experience Replay.
     # Specify a replay buffer and its capacity.
