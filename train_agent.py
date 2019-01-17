@@ -51,7 +51,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
     explorer = chainerrl.explorers.LinearDecayEpsilonGreedy(
         start_epsilon=1.0,
         end_epsilon=0.1,
-        decay_steps=1000,
+        decay_steps=300000,
         random_action_func=env.action_space.sample)
 
     # DQN uses Experience Replay.
