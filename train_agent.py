@@ -212,9 +212,10 @@ def run_localization_evaluation_episodes(env, agent, n_runs, max_episode_len=Non
         agent.stop_episode()
         # As mixing float and numpy float causes errors in statistics
         # functions, here every score is cast to float.
+        iou = float(env.iou) if done else float(0)
+        ious.append(iou)
         scores.append(float(test_r))
-        ious.append(float(env.iou) if done else float(0))
-        logger.info('evaluation episode %s length:%s R:%s IoU:%s', i, t, test_r, env.iou)
+        logger.info('evaluation episode %s length:%s R:%s IoU:%s', i, t, test_r, iou)
     return scores
 
 
