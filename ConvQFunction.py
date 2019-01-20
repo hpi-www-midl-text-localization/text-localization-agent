@@ -34,15 +34,15 @@ class ConvQFunction(chainer.ChainList):
             VGG3Block(512, 512),
             FCBlock())
 
-    def forward(self, x):
-        # x, history = state[0]
-        # x = np.array([x])
-        # i = 0
+    def forward(self, state):
+        x, history = state[0]
+        x = chainer.backends.cuda.get_array_module().array([x])
+        i = 0
         for f in self.children():
-            # if i == 4:
-            #    x = F.concat((x.reshape(-1), history), 0).reshape((1, -1))
+            if i == 5:
+               x = F.concat((x.reshape(-1), history), 0).reshape((1, -1))
             x = f(x)
-            # i += 1
+            i += 1
 
         return chainerrl.action_value.DiscreteActionValue(x)
 
@@ -87,7 +87,7 @@ class FCBlock(chainer.Chain):
         w = chainer.initializers.HeNormal()
         super(FCBlock, self).__init__()
         with self.init_scope():
-            self.fc4 = L.Linear(25088, 4096, initialW=w)
+            self.fc4 = L.Linear(25178, 4096, initialW=w)
             self.fc5 = L.Linear(4096, 4096, initialW=w)
             self.fc6 = L.Linear(4096, 9, initialW=w)
 
