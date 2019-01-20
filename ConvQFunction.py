@@ -4,6 +4,26 @@ import chainer.links as L
 import chainerrl
 
 
+class QFunction(chainer.Chain):
+
+    def __init__(self, n_actions, n_hidden_channels=50):
+        super().__init__()
+        with self.init_scope():
+            self.l0 = L.Linear(None, n_hidden_channels)
+            self.l1 = L.Linear(n_hidden_channels, n_hidden_channels)
+            self.l2 = L.Linear(n_hidden_channels, n_actions)
+
+    def __call__(self, x, test=False):
+        """
+        Args:
+            x (ndarray or chainer.Variable): An observation
+            test (bool): a flag indicating whether it is in test mode
+        """
+        h = F.tanh(self.l0(x))
+        h = F.tanh(self.l1(h))
+        return chainerrl.action_value.DiscreteActionValue(self.l2(h))
+
+
 class ConvQFunction(chainer.ChainList):
     def __init__(self):
         super(ConvQFunction, self).__init__(

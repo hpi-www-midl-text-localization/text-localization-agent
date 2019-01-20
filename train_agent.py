@@ -11,7 +11,7 @@ import sys
 from tb_chainer import SummaryWriter
 import time
 import re
-from ConvQFunction import ConvQFunction
+from ConvQFunction import QFunction, ConvQFunction
 
 
 @click.command()
@@ -35,7 +35,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
 
     obs_size = 4186
     n_actions = env.action_space.n
-    q_func = ConvQFunction()
+    q_func = QFunction()
     # q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
     #    obs_size, n_actions,
     #    n_hidden_layers=2, n_hidden_channels=1024)
