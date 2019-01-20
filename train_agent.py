@@ -61,7 +61,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
     replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 6)
 
     # Now create an agent that will interact with the environment.
-    agent = chainerrl.agents.DQN(
+    agent = chainerrl.agents.DoubleDQN(
         q_func, optimizer, replay_buffer, gamma, explorer,
         gpu=gpu,
         replay_start_size=500, update_interval=1,
