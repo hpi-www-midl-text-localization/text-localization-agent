@@ -2,6 +2,7 @@ import chainer
 import chainer.functions as F
 import chainer.links as L
 import chainerrl
+import numpy as np
 
 
 class QFunction(chainer.Chain):
@@ -36,7 +37,7 @@ class ConvQFunction(chainer.ChainList):
 
     def forward(self, state):
         x, history = state[0]
-        x = chainer.backends.cuda.get_array_module().array([x])
+        x = chainer.backends.cuda.get_array_module().array([x], dtype=np.float32)
         i = 0
         for f in self.children():
             if i == 5:
