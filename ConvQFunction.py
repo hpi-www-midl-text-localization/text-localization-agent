@@ -52,7 +52,7 @@ class VGG2Block(chainer.Chain):
         w = chainer.initializers.HeNormal()
         super(VGG2Block, self).__init__()
         with self.init_scope():
-            self.conv1 = L.Convolution2D(None, n_channels, 3, 1, 1, initialW=w)
+            self.conv1 = L.Convolution2D(in_channels, n_channels, 3, 1, 1, initialW=w)
             self.conv2 = L.Convolution2D(
                 n_channels, n_channels, 3, 1, 1, initialW=w)
 
@@ -68,7 +68,7 @@ class VGG3Block(chainer.Chain):
         w = chainer.initializers.HeNormal()
         super(VGG3Block, self).__init__()
         with self.init_scope():
-            self.conv1 = L.Convolution2D(None, n_channels, 3, 1, 1, initialW=w)
+            self.conv1 = L.Convolution2D(in_channels, n_channels, 3, 1, 1, initialW=w)
             self.conv2 = L.Convolution2D(
                 n_channels, n_channels, 3, 1, 1, initialW=w)
             self.conv3 = L.Convolution2D(
