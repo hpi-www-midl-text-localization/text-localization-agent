@@ -19,7 +19,7 @@ from ConvQFunction import QFunction, ConvQFunction
 @click.option("--gpu", default=-1, help="ID of the GPU to be used. -1 if the CPU should be used instead.")
 @click.option("--imagefile", "-i", default='image_locations.txt', help="Path to the file containing the image locations.", type=click.Path(exists=True))
 @click.option("--boxfile", "-b", default='bounding_boxes.npy', help="Path to the bounding boxes.", type=click.Path(exists=True))
-@click.option("--outdir", default="result")
+@click.option("--outdir", default="result", help='The output directory.')
 @click.option("--tensorboard/--no-tensorboard", default=False)
 def main(steps, gpu, imagefile, boxfile, outdir, tensorboard):
     print(steps)
