@@ -27,11 +27,11 @@ class QFunction(chainer.Chain):
 class ConvQFunction(chainer.ChainList):
     def __init__(self):
         super(ConvQFunction, self).__init__(
-            VGG2Block(64),
-            VGG2Block(128),
-            VGG3Block(256),
-            VGG3Block(512),
-            VGG3Block(512),
+            VGG2Block(3, 64),
+            VGG2Block(64, 128),
+            VGG3Block(128, 256),
+            VGG3Block(256, 512),
+            VGG3Block(512, 512),
             FCBlock())
 
     def forward(self, x):
@@ -48,7 +48,7 @@ class ConvQFunction(chainer.ChainList):
 
 
 class VGG2Block(chainer.Chain):
-    def __init__(self, n_channels):
+    def __init__(self, in_channels, n_channels):
         w = chainer.initializers.HeNormal()
         super(VGG2Block, self).__init__()
         with self.init_scope():
@@ -64,7 +64,7 @@ class VGG2Block(chainer.Chain):
 
 
 class VGG3Block(chainer.Chain):
-    def __init__(self, n_channels):
+    def __init__(self, in_channels, n_channels):
         w = chainer.initializers.HeNormal()
         super(VGG3Block, self).__init__()
         with self.init_scope():
@@ -87,7 +87,7 @@ class FCBlock(chainer.Chain):
         w = chainer.initializers.HeNormal()
         super(FCBlock, self).__init__()
         with self.init_scope():
-            self.fc4 = L.Linear(None, 4096, initialW=w)
+            self.fc4 = L.Linear(25088, 4096, initialW=w)
             self.fc5 = L.Linear(4096, 4096, initialW=w)
             self.fc6 = L.Linear(4096, 9, initialW=w)
 

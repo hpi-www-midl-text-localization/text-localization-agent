@@ -35,7 +35,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
 
     obs_size = 4186
     n_actions = env.action_space.n
-    q_func = QFunction()
+    q_func = ConvQFunction()
     # q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
     #    obs_size, n_actions,
     #    n_hidden_layers=2, n_hidden_channels=1024)
@@ -61,7 +61,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
     replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 6)
 
     # Now create an agent that will interact with the environment.
-    agent = chainerrl.agents.DoubleDQN(
+    agent = chainerrl.agents.DQN(
         q_func, optimizer, replay_buffer, gamma, explorer,
         gpu=gpu,
         replay_start_size=500, update_interval=1,
