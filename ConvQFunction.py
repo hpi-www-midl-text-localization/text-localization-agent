@@ -7,11 +7,11 @@ import chainerrl
 class ConvQFunction(chainer.ChainList):
     def __init__(self):
         super(ConvQFunction, self).__init__(
-            VGGBlock(64),
-            VGGBlock(128),
-            VGGBlock(256, 3),
-            VGGBlock(512, 3),
-            VGGBlock(512, 3),
+            VGG2Block(64),
+            VGG2Block(128),
+            VGG3Block(256),
+            VGG3Block(512),
+            VGG3Block(512),
             FCBlock())
 
     def forward(self, x):
@@ -27,25 +27,37 @@ class ConvQFunction(chainer.ChainList):
         return chainerrl.action_value.DiscreteActionValue(x)
 
 
-class VGGBlock(chainer.Chain):
-    def __init__(self, n_channels, n_convs=2):
+class VGG2Block(chainer.Chain):
+    def __init__(self, n_channels):
         w = chainer.initializers.HeNormal()
-        super(VGGBlock, self).__init__()
+        super(VGG2Block, self).__init__()
         with self.init_scope():
             self.conv1 = L.Convolution2D(None, n_channels, 3, 1, 1, initialW=w)
             self.conv2 = L.Convolution2D(
                 n_channels, n_channels, 3, 1, 1, initialW=w)
-            if n_convs == 3:
-                self.conv3 = L.Convolution2D(
-                    n_channels, n_channels, 3, 1, 1, initialW=w)
-
-        self.n_convs = n_convs
 
     def forward(self, x):
         h = F.relu(self.conv1(x))
         h = F.relu(self.conv2(h))
-        if self.n_convs == 3:
-            h = F.relu(self.conv3(h))
+        h = F.max_pooling_2d(h, 2, 2)
+        return h
+
+
+class VGG3Block(chainer.Chain):
+    def __init__(self, n_channels):
+        w = chainer.initializers.HeNormal()
+        super(VGG3Block, self).__init__()
+        with self.init_scope():
+            self.conv1 = L.Convolution2D(None, n_channels, 3, 1, 1, initialW=w)
+            self.conv2 = L.Convolution2D(
+                n_channels, n_channels, 3, 1, 1, initialW=w)
+            self.conv3 = L.Convolution2D(
+                n_channels, n_channels, 3, 1, 1, initialW=w)
+
+    def forward(self, x):
+        h = F.relu(self.conv1(x))
+        h = F.relu(self.conv2(h))
+        h = F.relu(self.conv3(h))
         h = F.max_pooling_2d(h, 2, 2)
         return h
 
