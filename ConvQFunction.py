@@ -6,7 +6,7 @@ import chainerrl
 
 class QFunction(chainer.Chain):
 
-    def __init__(self, n_actions, n_hidden_channels=50):
+    def __init__(self, n_actions=9, n_hidden_channels=50):
         super().__init__()
         with self.init_scope():
             self.l0 = L.Linear(None, n_hidden_channels)
