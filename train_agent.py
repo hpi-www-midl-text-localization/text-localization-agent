@@ -11,7 +11,7 @@ import sys
 from tb_chainer import SummaryWriter
 import time
 import re
-from ConvQFunction import QFunction, ConvQFunction
+from ConvQFunction import ConvQFunction
 
 
 @click.command()
