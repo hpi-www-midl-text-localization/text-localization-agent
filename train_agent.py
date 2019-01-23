@@ -153,6 +153,7 @@ class TensorBoardEvaluationLoggingHandler(logging.Handler):
         self.episode_rewards = np.empty(eval_run_count)
         self.episode_lengths = np.empty(eval_run_count)
         self.episode_ious = np.empty(eval_run_count)
+        self.episode_max_ious = np.empty(eval_run_count)
         return
 
     def emit(self, record):
@@ -162,16 +163,18 @@ class TensorBoardEvaluationLoggingHandler(logging.Handler):
             step_count = self.agent.t
             self.summary_writer.add_scalar('evaluation_new_best_score', new_best_score, step_count)
 
-        match_reward = re.search(r'evaluation episode ([^ ]*) length:([^ ]*) R:([^ ]*) IoU:([^ ]*)', record.getMessage())
+        match_reward = re.search(r'evaluation episode ([^ ]*) length:([^ ]*) R:([^ ]*) IoU:([^ ]*) Max_IoU:([^ ]*)', record.getMessage())
         if match_reward:
             episode_number = int(match_reward.group(1))
             episode_length = int(match_reward.group(2))
             episode_reward = float(match_reward.group(3))
             episode_iou = float(match_reward.group(4))
+            episode_max_iou = float(match_reward.group(5))
 
             self.episode_lengths[episode_number] = episode_length
             self.episode_rewards[episode_number] = episode_reward
             self.episode_ious[episode_number] = episode_iou
+            self.episode_max_ious[episode_number] = episode_max_iou
 
             if episode_number == self.eval_run_count - 1:
                 step_count = self.agent.t
@@ -181,6 +184,7 @@ class TensorBoardEvaluationLoggingHandler(logging.Handler):
                 self.summary_writer.add_scalar('evaluation_reward_variance', np.var(self.episode_rewards), step_count)
                 self.summary_writer.add_scalar('evaluation_iou_mean', np.mean(self.episode_ious), step_count)
                 self.summary_writer.add_scalar('evaluation_iou_median', np.median(self.episode_ious), step_count)
+                self.summary_writer.add_scalar('evaluation_max_iou_mean', np.mean(self.episode_max_ious), step_count)
         return
 
 
@@ -201,7 +205,6 @@ def run_localization_evaluation_episodes(env, agent, n_runs, max_episode_len=Non
     """
     logger = logger or logging.getLogger(__name__)
     scores = []
-    ious = []
     for i in range(n_runs):
         obs = env.reset()
         done = False
@@ -216,9 +219,9 @@ def run_localization_evaluation_episodes(env, agent, n_runs, max_episode_len=Non
         # As mixing float and numpy float causes errors in statistics
         # functions, here every score is cast to float.
         iou = float(env.iou) if done else float(0)
-        ious.append(iou)
+        max_iou = float(env.max_iou)
         scores.append(float(test_r))
-        logger.info('evaluation episode %s length:%s R:%s IoU:%s', i, t, test_r, iou)
+        logger.info('evaluation episode %s length:%s R:%s IoU:%s Max_IoU:%s', i, t, test_r, iou, max_iou)
     return scores
 
 
