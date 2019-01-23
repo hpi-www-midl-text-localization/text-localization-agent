@@ -32,7 +32,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
 
     env = TextLocEnv(absolute_paths, bboxes, gpu)
 
-    obs_size = 4186
+    obs_size = 4187
     n_actions = env.action_space.n
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
         obs_size, n_actions,
