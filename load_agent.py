@@ -121,16 +121,22 @@ def evaluate(gpu, imagefile, boxfile, agentdirectory, save):
     gt_bboxes = list(map(convert_gt_bboxes_to_chainercv_format, gt_bboxes))
     gt_labels = []
     for bbox in gt_bboxes:
-        labels = np.ones((len(bbox), 1), dtype=np.bool_)
+        labels = []
+        for _ in range(len(bbox)):
+            labels.append(True)
         gt_labels.append(labels)
 
     pred_bboxes = list(map(convert_env_bboxes_to_chainercv_format, pred_bboxes))
     pred_labels = []
     pred_scores = []
     for bbox in pred_bboxes:
-        labels = np.ones((len(bbox), 1), dtype=np.bool_)
-        scores = np.ones((len(bbox), 1), dtype=np.float32)
+        labels = []
+        scores = []
+        for _ in range(len(bbox)):
+            labels.append(True)
+            scores.append(1.0)
         pred_labels.append(labels)
+        scores = np.array(scores, dtype=np.float32)
         pred_scores.append(scores)
 
     np.save('gt_bboxes.npy', gt_bboxes)
