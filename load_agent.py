@@ -1,6 +1,7 @@
 from text_localization_environment import TextLocEnv
 
 import os
+import sys
 import numpy as np
 import click
 from tqdm import tqdm
@@ -174,4 +175,4 @@ def convert_env_bboxes_to_chainercv_format(bboxes):
     return np.array(bboxes_chainercv, dtype=np.float32)
 
 if __name__ == '__main__':
-    evaluate()
+    evaluate(sys.argv[1:])
