@@ -139,11 +139,12 @@ def evaluate(gpu, imagefile, boxfile, agentdirectory, save):
         scores = np.array(scores, dtype=np.float32)
         pred_scores.append(scores)
 
-    np.save('gt_bboxes.npy', gt_bboxes)
-    np.save('gt_labels.npy', gt_labels)
-    np.save('pred_bboxes.npy', pred_bboxes)
-    np.save('pred_labels.npy', pred_labels)
-    np.save('pred_scores.npy', pred_scores)
+    if save:
+        np.save('gt_bboxes.npy', gt_bboxes)
+        np.save('gt_labels.npy', gt_labels)
+        np.save('pred_bboxes.npy', pred_bboxes)
+        np.save('pred_labels.npy', pred_labels)
+        np.save('pred_scores.npy', pred_scores)
 
     eval = eval_detection_voc(pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels)
 
