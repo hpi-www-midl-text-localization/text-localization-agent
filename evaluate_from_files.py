@@ -15,7 +15,7 @@ def main(pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels):
     gt_bboxes = np.load(gt_bboxes)
     gt_labels = np.load(gt_labels)
     eval = eval_detection_voc(pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels)
-    print(eval)
+    print('Mean average precision (map): %f' % eval['map'])
     return
 
 if __name__ == '__main__':
