@@ -68,11 +68,12 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
 
     eval_run_count = 10
 
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    agentClassName = agent.__class__.__name__[:10]
+
     step_hooks = []
     logger = None
     if tensorboard:
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        agentClassName = agent.__class__.__name__[:10]
         writer = SummaryWriter("tensorboard/tensorBoard_exp_" + timestr + "_" + agentClassName)
         step_hooks = [TensorBoardLoggingStepHook(writer)]
         handler = TensorBoardEvaluationLoggingHandler(writer, agent, eval_run_count)
@@ -92,7 +93,7 @@ def main(steps, gpu, imagefile, boxfile, tensorboard):
         step_hooks=step_hooks,
         logger=logger)
 
-    agent.save('agent')
+    agent.save('agent_' + timestr + "_" + agentClassName)
 
 
 class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
