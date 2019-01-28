@@ -1,6 +1,5 @@
 import click
 import os
-from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 from text_localization_environment import TextLocEnv
 from chainerrl.experiments.train_agent import train_agent_with_evaluation
@@ -108,37 +107,7 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
 
         self.summary_writer.add_scalar('average_loss', agent.average_loss, step_count)
 
-        last_action_name = env.action_set[agent.last_action].__name__
-        debug_image = self.get_debug_image_from_environment_image(image = env.episode_image.copy(),
-                                                                  bbox = env.bbox,
-                                                                  last_action_name = last_action_name)
-
-        # Prepare the image for further use in rb_chainer's add_image() method
-        debug_image = np.array(debug_image, np.float32) / 255
-        debug_image = debug_image.transpose((2, 0, 1))
-
-        self.summary_writer.add_image('episode_image_debug', debug_image, step_count)
         return
-
-
-    def get_debug_image_from_environment_image(self, image, bbox, last_action_name):
-        image = image.copy()
-
-        debug_image = Image.new(mode='RGB',
-                                size=(image.width, image.height + 16),
-                                color='black')
-        debug_image.paste(image)
-
-        draw = ImageDraw.Draw(debug_image)
-        draw.rectangle(bbox.tolist(), outline='white')
-        draw.rectangle((0, image.height, image.width, image.height + 16), fill='black')
-        font = ImageFont.truetype('fonts/open-sans/OpenSans-SemiBold.ttf', 12)
-        draw.text(xy=(2, image.height),
-                  text='Last action: %s' % last_action_name,
-                  fill='white',
-                  font=font)
-
-        return debug_image
 
 
 class TensorBoardEvaluationLoggingHandler(logging.Handler):
