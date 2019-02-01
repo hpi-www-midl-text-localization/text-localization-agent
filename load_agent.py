@@ -68,7 +68,7 @@ def generate_image_sequence(gpu, imagefile, boxfile, agentdirectory):
     * Generate a video out of the images using ffmpeg:
       $ ffmpeg -framerate 2 -i human/%03d.png \
         -framerate 2 -i box/%03d.png \
-        -filter_complex "[0:v]scale=224:-1[v0];[v0][1:v]vstack=inputs=2" \
+        -filter_complex "[0:v]scale=224:-1,pad=iw+6:ih:color=white[v0];[v0][1:v]hstack=inputs=2" \
         -pix_fmt yuv420p \
         output.mp4
     """
