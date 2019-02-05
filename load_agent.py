@@ -15,7 +15,7 @@ def create_environment(imagefile='image_locations.txt', boxfile='bounding_boxes.
 
 
 def load_agent(env, directory="agent", gpu=0):
-    obs_size = 4187
+    obs_size = 2139
     n_actions = env.action_space.n
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
         obs_size, n_actions,
