@@ -8,6 +8,7 @@ import chainerrl
 import numpy as np
 from tqdm import tqdm
 
+
 def create_environment(imagefile='image_locations.txt', boxfile='bounding_boxes.npy', gpu=0):
     locations = np.loadtxt(imagefile, dtype=str).tolist()
     bboxes = np.load(boxfile)
@@ -17,7 +18,7 @@ def create_environment(imagefile='image_locations.txt', boxfile='bounding_boxes.
     return env
 
 
-def load_agent(env, directory="agent", gpu=0):
+def load_agent(env, directory="agent", gpu=0, epsilon=0.3):
     obs_size = 2139
     n_actions = env.action_space.n
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
@@ -36,7 +37,7 @@ def load_agent(env, directory="agent", gpu=0):
 
     # Use epsilon-greedy for exploration
     explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-        epsilon=0.3, random_action_func=env.action_space.sample)
+        epsilon=epsilon, random_action_func=env.action_space.sample)
 
     # DQN uses Experience Replay.
     # Specify a replay buffer and its capacity.
@@ -52,6 +53,7 @@ def load_agent(env, directory="agent", gpu=0):
     agent.load(directory)
 
     return agent
+
 
 @click.command()
 @click.option("--gpu", default=-1, help="ID of the GPU to be used. -1 if the CPU should be used instead.")
@@ -81,7 +83,7 @@ def generate_image_sequence(gpu, imagefile, boxfile, agentdirectory):
     gt_bboxes = np.load(boxfile)
 
     env = TextLocEnv(absolute_paths, gt_bboxes, gpu)
-    agent = load_agent(env, agentdirectory, gpu, epsilon = 0.0)
+    agent = load_agent(env, agentdirectory, gpu, epsilon=0.0)
 
     images_human = []
     images_box = []
@@ -122,7 +124,6 @@ def generate_image_sequence(gpu, imagefile, boxfile, agentdirectory):
     return
 
 
-
 def episode(env, agent):
     obs = env.reset()
     done = False
@@ -138,6 +139,7 @@ def episode(env, agent):
             print("Done!")
     print('test episode:', 'R:', R)
     agent.stop_episode()
+
 
 if __name__ == '__main__':
     generate_image_sequence(sys.argv[1:])
