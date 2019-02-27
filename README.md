@@ -2,6 +2,10 @@
 
 The code to train the agent.
 
+## Attention!
+
+This project currently contains a memory leak, which means that during long training runs it might use up all your memory and make the server slow down or crash!
+
 ## Prerequisites
 
 You need Python 3 (preferably 3.6) installed, as well as the requirements from `requirements.txt`:
