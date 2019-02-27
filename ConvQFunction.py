@@ -2,28 +2,22 @@ import chainer
 import chainer.functions as F
 import chainer.links as L
 import chainerrl
-import numpy as np
 
 
 class ConvQFunction(chainer.ChainList):
     def __init__(self):
         super(ConvQFunction, self).__init__(
+            # ChainerRL requires the input and output dimensions to be specified in advance.
             VGG2Block(3, 64),
             VGG2Block(64, 128),
             VGG3Block(128, 256),
             VGG3Block(256, 512),
             VGG3Block(512, 512),
-            FCBlock())
+            FCBlock(25088, 4096, 9))
 
     def forward(self, x):
-        # x, history = state[0]
-        # x = chainer.backends.cuda.get_array_module().array([x], dtype=np.float32)
-        # i = 0
         for f in self.children():
-            # if i == 5:
-            #   x = F.concat((x.reshape(-1), history), 0).reshape((1, -1))
             x = f(x)
-            # i += 1
 
         return chainerrl.action_value.DiscreteActionValue(x)
 
@@ -61,13 +55,13 @@ class VGG3Block(chainer.Chain):
 
 
 class FCBlock(chainer.Chain):
-    def __init__(self):
+    def __init__(self, in_channels, n_channels, out_channels):
         w = chainer.initializers.HeNormal()
         super(FCBlock, self).__init__()
         with self.init_scope():
-            self.fc4 = L.Linear(25088, 4096, initialW=w)
-            self.fc5 = L.Linear(4096, 4096, initialW=w)
-            self.fc6 = L.Linear(4096, 9, initialW=w)
+            self.fc4 = L.Linear(in_channels, n_channels, initialW=w)
+            self.fc5 = L.Linear(n_channels, n_channels, initialW=w)
+            self.fc6 = L.Linear(n_channels, out_channels, initialW=w)
 
     def forward(self, x):
         h = F.dropout(F.relu(self.fc4(x)))
