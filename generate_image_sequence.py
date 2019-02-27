@@ -1,7 +1,5 @@
 import os
 import click
-import numpy as np
-from text_localization_environment import TextLocEnv
 from tqdm import tqdm
 from load_agent import load_agent, create_environment
 
@@ -26,12 +24,6 @@ def generate_image_sequence(gpu, imagefile, boxfile, agentdirectory):
         output.mp4
     """
     max_steps_per_image = 50
-
-    #relative_paths = np.loadtxt(imagefile, dtype=str)
-    #images_base_path = os.path.dirname(imagefile)
-    #absolute_paths = [images_base_path + relative_paths.item().strip('.')]
-
-    #gt_bboxes = np.load(boxfile)
 
     env = create_environment(imagefile, boxfile, gpu)
     agent = load_agent(env, agentdirectory, gpu, epsilon=0.0)
