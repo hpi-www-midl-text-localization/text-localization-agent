@@ -149,6 +149,7 @@ def evaluate(gpu, imagefile, boxfile, agentdirectory, save):
     eval = eval_detection_voc(pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels)
 
     print('Mean average precision (map): %f' % eval['map'])
+    print('You may use the evaluate_from_files.py script to calculate the map, precision and recall for differnent IoU thresholds.')
     return
 
 def convert_gt_bboxes_to_chainercv_format(bboxes):
