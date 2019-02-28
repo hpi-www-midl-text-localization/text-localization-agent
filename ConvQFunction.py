@@ -5,7 +5,7 @@ import chainerrl
 
 
 class ConvQFunction(chainer.ChainList):
-    def __init__(self):
+    def __init__(self, n_actions):
         super(ConvQFunction, self).__init__(
             # ChainerRL requires the input and output dimensions to be specified in advance.
             VGG2Block(3, 64),
@@ -13,7 +13,7 @@ class ConvQFunction(chainer.ChainList):
             VGG3Block(128, 256),
             VGG3Block(256, 512),
             VGG3Block(512, 512),
-            FCBlock(25088, 4096, 9))
+            FCBlock(25088, 4096, n_actions))
 
     def forward(self, x):
         for f in self.children():

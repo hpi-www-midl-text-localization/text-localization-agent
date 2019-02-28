@@ -33,12 +33,9 @@ def main(steps, gpu, imagefile, boxfile, outdir, tensorboard):
 
     env = TextLocEnv(absolute_paths, bboxes, gpu)
 
-    obs_size = 2139
     n_actions = env.action_space.n
-    q_func = ConvQFunction()
-    # q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
-    #    obs_size, n_actions,
-    #    n_hidden_layers=2, n_hidden_channels=1024)
+    q_func = ConvQFunction(n_actions)
+
     if gpu != -1:
         q_func = q_func.to_gpu(gpu)
 
