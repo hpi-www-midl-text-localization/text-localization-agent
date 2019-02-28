@@ -1,10 +1,8 @@
-import os
 import sys
 import numpy as np
 import click
 from tqdm import tqdm
-from text_localization_environment import TextLocEnv
-from load_agent import load_agent
+from load_agent import load_agent, create_environment
 from chainercv.evaluations.eval_detection_voc import eval_detection_voc
 
 
@@ -16,18 +14,13 @@ from chainercv.evaluations.eval_detection_voc import eval_detection_voc
 @click.option("--save/--dont-save", default=False, help="Boolean indicating whether the intermediate results of the evaluation should be saved.")
 def evaluate(gpu, imagefile, boxfile, agentdirectory, save):
     max_steps_per_image = 200
-    max_steps_per_run = 40
+    max_steps_per_run = 50
     max_trigger_events_per_image = 1
 
-    relative_paths = np.loadtxt(imagefile, dtype=str)
-    images_base_path = os.path.dirname(imagefile)
-    absolute_paths = [images_base_path + i.strip('.') for i in relative_paths]
-
     images = np.loadtxt(imagefile, dtype=str).tolist()
-
     gt_bboxes = np.load(boxfile)
 
-    env = TextLocEnv(absolute_paths, gt_bboxes, gpu)
+    env = create_environment(imagefile, boxfile, gpu)
     agent = load_agent(env, agentdirectory, gpu)
 
     pred_bboxes = []
