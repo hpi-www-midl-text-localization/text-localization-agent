@@ -1,5 +1,4 @@
 from text_localization_environment import TextLocEnv
-
 import chainer
 import chainerrl
 import numpy as np
@@ -14,8 +13,8 @@ def create_environment(imagefile='image_locations.txt', boxfile='bounding_boxes.
     return env
 
 
-def load_agent(env, directory="agent", gpu=0):
-    obs_size = 4186
+def load_agent(env, directory="agent", gpu=0, epsilon=0.3):
+    obs_size = 2139
     n_actions = env.action_space.n
     q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
         obs_size, n_actions,
@@ -33,7 +32,7 @@ def load_agent(env, directory="agent", gpu=0):
 
     # Use epsilon-greedy for exploration
     explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-        epsilon=0.3, random_action_func=env.action_space.sample)
+        epsilon=epsilon, random_action_func=env.action_space.sample)
 
     # DQN uses Experience Replay.
     # Specify a replay buffer and its capacity.

@@ -1,6 +1,5 @@
 import click
 import os
-from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 from text_localization_environment import TextLocEnv
 from chainerrl.experiments.train_agent import train_agent_with_evaluation
@@ -34,7 +33,7 @@ def main(steps, gpu, imagefile, boxfile, outdir, tensorboard):
 
     env = TextLocEnv(absolute_paths, bboxes, gpu)
 
-    obs_size = 4186
+    obs_size = 2139
     n_actions = env.action_space.n
     q_func = ConvQFunction()
     # q_func = chainerrl.q_functions.FCStateQFunctionWithDiscreteAction(
@@ -72,11 +71,12 @@ def main(steps, gpu, imagefile, boxfile, outdir, tensorboard):
 
     eval_run_count = 10
 
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    agentClassName = agent.__class__.__name__[:10]
+
     step_hooks = []
     logger = None
     if tensorboard:
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        agentClassName = agent.__class__.__name__[:10]
         writer = SummaryWriter("tensorboard/tensorBoard_exp_" + timestr + "_" + agentClassName)
         step_hooks = [TensorBoardLoggingStepHook(writer)]
         handler = TensorBoardEvaluationLoggingHandler(writer, agent, eval_run_count)
@@ -96,7 +96,7 @@ def main(steps, gpu, imagefile, boxfile, outdir, tensorboard):
         step_hooks=step_hooks,
         logger=logger)
 
-    agent.save('agent')
+    agent.save('agent_' + timestr + "_" + agentClassName)
 
 
 class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
@@ -111,37 +111,7 @@ class TensorBoardLoggingStepHook(chainerrl.experiments.StepHook):
 
         self.summary_writer.add_scalar('average_loss', agent.average_loss, step_count)
 
-        last_action_name = env.action_set[agent.last_action].__name__
-        debug_image = self.get_debug_image_from_environment_image(image = env.episode_image.copy(),
-                                                                  bbox = env.bbox,
-                                                                  last_action_name = last_action_name)
-
-        # Prepare the image for further use in rb_chainer's add_image() method
-        debug_image = np.array(debug_image, np.float32) / 255
-        debug_image = debug_image.transpose((2, 0, 1))
-
-        self.summary_writer.add_image('episode_image_debug', debug_image, step_count)
         return
-
-
-    def get_debug_image_from_environment_image(self, image, bbox, last_action_name):
-        image = image.copy()
-
-        debug_image = Image.new(mode='RGB',
-                                size=(image.width, image.height + 16),
-                                color='black')
-        debug_image.paste(image)
-
-        draw = ImageDraw.Draw(debug_image)
-        draw.rectangle(bbox.tolist(), outline='white')
-        draw.rectangle((0, image.height, image.width, image.height + 16), fill='black')
-        font = ImageFont.truetype('fonts/open-sans/OpenSans-SemiBold.ttf', 12)
-        draw.text(xy=(2, image.height),
-                  text='Last action: %s' % last_action_name,
-                  fill='white',
-                  font=font)
-
-        return debug_image
 
 
 class TensorBoardEvaluationLoggingHandler(logging.Handler):
