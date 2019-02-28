@@ -2,6 +2,10 @@
 
 The code to train the agent.
 
+## Attention!
+
+This project currently contains a memory leak, which means that during long training runs it might use up all your memory and make the server slow down or crash!
+
 ## Prerequisites
 
 You need Python 3 (preferably 3.6) installed, as well as the requirements from `requirements.txt`:
@@ -60,6 +64,7 @@ such as [tmux](https://wiki.ubuntuusers.de/tmux/) or [screen](https://wiki.ubunt
     $ export CUDA_PATH=/usr/local/cuda
     $ export LD_LIBRARY_PATH=$CUDA_PATH/lib64:$LD_LIBRARY_PATH
     ```
+* To download the ResNet-152 caffemodel (it isn't downloaded automatically) see [link](https://onedrive.live.com/?authkey=%21AAFW2-FVoxeVRck&id=4006CBB8476FF777%2117887&cid=4006CBB8476FF777) and save it where necessary (an error will tell you where if you try to create a TextLocEnv).
 * Start training!
 
 These instructions are for starting from scratch, for example if there is already a suitable virtual environment you 
