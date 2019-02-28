@@ -1,6 +1,8 @@
+import sys
 import click
 import numpy as np
 from chainercv.evaluations.eval_detection_voc import eval_detection_voc, calc_detection_voc_prec_rec
+
 
 @click.command()
 @click.option("--pred_bboxes", default='pred_bboxes.npy', type=click.Path(exists=True))
@@ -9,7 +11,7 @@ from chainercv.evaluations.eval_detection_voc import eval_detection_voc, calc_de
 @click.option("--gt_bboxes", default='gt_bboxes.npy', type=click.Path(exists=True))
 @click.option("--gt_labels", default='gt_labels.npy', type=click.Path(exists=True))
 @click.option("--iou_threshold", default=0.5)
-def main(pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels, iou_threshold):
+def evaluate_from_files(pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels, iou_threshold):
     pred_bboxes = np.load(pred_bboxes)
     pred_labels = np.load(pred_labels)
     pred_scores = np.load(pred_scores)
@@ -26,5 +28,6 @@ def main(pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels, iou_thresh
     print('Mean recall: %f' % np.mean(rec[1]))
     return
 
+
 if __name__ == '__main__':
-    main()
+    evaluate_from_files(sys.argv[1:])
