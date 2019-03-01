@@ -2,6 +2,10 @@
 
 The code to train the agent.
 
+## Attention!
+
+This project currently contains a memory leak, which means that during long training runs it might use up all your memory and make the server slow down or crash!
+
 ## Prerequisites
 
 You need Python 3 (preferably 3.6) installed, as well as the requirements from `requirements.txt`:
@@ -60,7 +64,30 @@ such as [tmux](https://wiki.ubuntuusers.de/tmux/) or [screen](https://wiki.ubunt
     $ export CUDA_PATH=/usr/local/cuda
     $ export LD_LIBRARY_PATH=$CUDA_PATH/lib64:$LD_LIBRARY_PATH
     ```
+* To download the ResNet-152 caffemodel (it isn't downloaded automatically) see [link](https://onedrive.live.com/?authkey=%21AAFW2-FVoxeVRck&id=4006CBB8476FF777%2117887&cid=4006CBB8476FF777) and save it where necessary (an error will tell you where if you try to create a TextLocEnv).
 * Start training!
 
 These instructions are for starting from scratch, for example if there is already a suitable virtual environment you 
 obviously don't need to create a new one.
+
+## Evaluating
+
+* To evaluate a previously trained agent on a dataset, you may use the `evaluate` method available as a click CLI when executing:
+    ```bash
+    $ python evaluate_agent.py
+    ```
+    (Run `python evaluate_agent.py --help` to see the required parameters for the CLI)
+* If you provide the `--save` flag in the CLI above, it creates `.npy` files which can be read by the `evaluate_from_files` CLI afterwards:
+    ```bash
+    $ python evaluate_from_files.py
+    ```
+    (Run `python evaluate_from_files.py --help` to see the required parameters for the CLI)
+* The `evaluate_from_files` CLI allows defining an IoU threshold used for the calculation of the evaluation metrics. Furthermore, it does not only output the mean average precision (mAP) but also the precision and recall values.
+
+## Creating image sequences/animations for visualization purposes
+
+* To create an image sequence of a an already trained agent acting on a specific image, use:
+    ```bash
+    $ python generate_image_sequence.py
+    ```
+    (Run `python generate_image_sequence.py --help` to see the required parameters for the CLI and have a look into the `generate_image_sequence.py` file for instructions on creating a video out of the generated single frames using ffmpeg) 
