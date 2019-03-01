@@ -1,16 +1,8 @@
-from text_localization_environment import TextLocEnv
+import os
+import numpy as np
 import chainer
 import chainerrl
-import numpy as np
-
-
-def create_environment(imagefile='image_locations.txt', boxfile='bounding_boxes.npy', gpu=0):
-    locations = np.loadtxt(imagefile, dtype=str).tolist()
-    bboxes = np.load(boxfile)
-
-    env = TextLocEnv(locations, bboxes, gpu)
-
-    return env
+from text_localization_environment import TextLocEnv
 
 
 def load_agent(env, directory="agent", gpu=0, epsilon=0.3):
@@ -48,6 +40,16 @@ def load_agent(env, directory="agent", gpu=0, epsilon=0.3):
     agent.load(directory)
 
     return agent
+
+
+def create_environment(imagefile='image_locations.txt', boxfile='bounding_boxes.npy', gpu=0):
+    relative_paths = np.loadtxt(imagefile, dtype=str)
+    images_base_path = os.path.dirname(imagefile)
+    absolute_paths = [images_base_path + i.strip('.') for i in relative_paths]
+
+    bboxes = np.load(boxfile)
+
+    return TextLocEnv(absolute_paths, bboxes, gpu)
 
 
 def episode(env, agent):
