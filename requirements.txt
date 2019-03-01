@@ -4,5 +4,7 @@ numpy
 click
 Pillow
 tensorboard-chainer
-click
+chainercv
+matplotlib
 tqdm
+click

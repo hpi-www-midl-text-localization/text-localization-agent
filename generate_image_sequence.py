@@ -15,7 +15,7 @@ def generate_image_sequence(gpu, imagefile, boxfile, agentdirectory):
     * Generate a dataset with exactly one image
       $ cd dataset-generator/ && python main.py -c 1
     * Generate step images for the agent that should be run
-      $ python load_agent.py (params: see @click.options)
+      $ python generate_image_sequence.py (params: see @click.options or run with --help flag)
     * Generate a video out of the images using ffmpeg:
       $ ffmpeg -framerate 2 -i human/%03d.png \
         -framerate 2 -i box/%03d.png \
